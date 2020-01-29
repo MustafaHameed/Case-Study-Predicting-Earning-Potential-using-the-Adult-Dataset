@@ -1,1 +1,678 @@
 
+> library(ggplot2)
+Warning message:
+package ‘ggplot2’ was built under R version 3.6.2 
+> library(plyr)
+Warning message:
+package ‘plyr’ was built under R version 3.6.2 
+> library(ROCR)
+Error in library(ROCR) : there is no package called ‘ROCR’
+> install.packages("ROCR")
+WARNING: Rtools is required to build R packages but no version of Rtools compatible with the currently running version of R was found. Note that the following incompatible version(s) of Rtools were found:
+
+  - Rtools 3.2 (installed at c:\Rtools)
+
+Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+Installing package into ‘C:/Users/its_t/Documents/R/win-library/3.6’
+(as ‘lib’ is unspecified)
+also installing the dependencies ‘gdata’, ‘caTools’, ‘gplots’
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.6/gdata_2.18.0.zip'
+Content type 'application/zip' length 1265356 bytes (1.2 MB)
+downloaded 1.2 MB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.6/caTools_1.18.0.zip'
+Content type 'application/zip' length 330501 bytes (322 KB)
+downloaded 322 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.6/gplots_3.0.1.2.zip'
+Content type 'application/zip' length 716149 bytes (699 KB)
+downloaded 699 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.6/ROCR_1.0-7.zip'
+Content type 'application/zip' length 203708 bytes (198 KB)
+downloaded 198 KB
+
+package ‘gdata’ successfully unpacked and MD5 sums checked
+package ‘caTools’ successfully unpacked and MD5 sums checked
+package ‘gplots’ successfully unpacked and MD5 sums checked
+package ‘ROCR’ successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+	C:\Users\its_t\AppData\Local\Temp\RtmpquZt7i\downloaded_packages
+> library(ROCR)
+Loading required package: gplots
+
+Attaching package: ‘gplots’
+
+The following object is masked from ‘package:stats’:
+
+    lowess
+
+Warning messages:
+1: package ‘ROCR’ was built under R version 3.6.2 
+2: package ‘gplots’ was built under R version 3.6.2 
+> adult <- read.table('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', 
++                     sep = ',', fill = F, strip.white = T)
+> colnames(adult) <- c('age', 'workclass', 'fnlwgt', 'educatoin', 
++                      'educatoin_num', 'marital_status', 'occupation', 'relationship', 'race', 'sex', 
++                      'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'income')
+> View(adult)
+> install.packages(c("kernlab", "randomForest"))
+WARNING: Rtools is required to build R packages but no version of Rtools compatible with the currently running version of R was found. Note that the following incompatible version(s) of Rtools were found:
+
+  - Rtools 3.2 (installed at c:\Rtools)
+
+Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+Installing packages into ‘C:/Users/its_t/Documents/R/win-library/3.6’
+(as ‘lib’ is unspecified)
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.6/kernlab_0.9-29.zip'
+Content type 'application/zip' length 2641401 bytes (2.5 MB)
+downloaded 2.5 MB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.6/randomForest_4.6-14.zip'
+Content type 'application/zip' length 250275 bytes (244 KB)
+downloaded 244 KB
+
+package ‘kernlab’ successfully unpacked and MD5 sums checked
+package ‘randomForest’ successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+	C:\Users\its_t\AppData\Local\Temp\RtmpquZt7i\downloaded_packages
+> library(ggplot2)
+> library(plyr)
+> library(ROCR)
+> adult <- read.table('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', 
++                     sep = ',', fill = F, strip.white = T)
+> colnames(adult) <- c('age', 'workclass', 'fnlwgt', 'educatoin', 
++                      'educatoin_num', 'marital_status', 'occupation', 'relationship', 'race', 'sex', 
++                      'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'income')
+> adult$educatoin <- NULL
+> adult$fnlwgt <- NULL
+> adult$relationship <- NULL
+> # histogram of age by income group
+> ggplot(adult) + aes(x=as.numeric(age), group=income, fill=income) + 
++   geom_histogram(binwidth=1, color='black')
+> # histogram of age by gender group
+> ggplot(adult) + aes(x=as.numeric(age), group=sex, fill=sex) + 
++   geom_histogram(binwidth=1, color='black')
+> summary(adult$workclass)
+               ?      Federal-gov        Local-gov     Never-worked          Private 
+            1836              960             2093                7            22696 
+    Self-emp-inc Self-emp-not-inc        State-gov      Without-pay 
+            1116             2541             1298               14 
+> levels(adult$workclass)[1] <- 'Unknown'
+> # combine into Government job
+> adult$workclass <- gsub('^Federal-gov', 'Government', adult$workclass)
+> adult$workclass <- gsub('^Local-gov', 'Government', adult$workclass)
+> adult$workclass <- gsub('^State-gov', 'Government', adult$workclass) 
+> # combine into Sele-Employed job
+> adult$workclass <- gsub('^Self-emp-inc', 'Self-Employed', adult$workclass)
+> adult$workclass <- gsub('^Self-emp-not-inc', 'Self-Employed', adult$workclass)
+> # combine into Other/Unknown
+> adult$workclass <- gsub('^Never-worked', 'Other', adult$workclass)
+> adult$workclass <- gsub('^Without-pay', 'Other', adult$workclass)
+> adult$workclass <- gsub('^Other', 'Other/Unknown', adult$workclass)
+> adult$workclass <- gsub('^Unknown', 'Other/Unknown', adult$workclass)
+> adult$workclass <- as.factor(adult$workclass)
+> summary(adult$workclass)
+   Government Other/Unknown       Private Self-Employed 
+         4351          1857         22696          3657 
+> # barplot of job type by income group
+> # get the counts by industry and income group
+> count <- table(adult[adult$workclass == 'Government',]$income)["<=50K"]
+> count <- c(count, table(adult[adult$workclass == 'Government',]$income)[">50K"])
+> count <- c(count, table(adult[adult$workclass == 'Other/Unknown',]$income)["<=50K"])
+> count <- c(count, table(adult[adult$workclass == 'Other/Unknown',]$income)[">50K"])
+> count <- c(count, table(adult[adult$workclass == 'Private',]$income)["<=50K"])
+> count <- c(count, table(adult[adult$workclass == 'Private',]$income)[">50K"])
+> count <- c(count, table(adult[adult$workclass == 'Self-Employed',]$income)["<=50K"])
+> count <- c(count, table(adult[adult$workclass == 'Self-Employed',]$income)[">50K"])
+> count <- as.numeric(count)
+> # create a dataframe
+> industry <- rep(levels(adult$workclass), each = 2)
+> income <- rep(c('<=50K', '>50K'), 4)
+> df <- data.frame(industry, income, count)
+> df
+       industry income count
+1    Government  <=50K  3010
+2    Government   >50K  1341
+3 Other/Unknown  <=50K  1666
+4 Other/Unknown   >50K   191
+5       Private  <=50K 17733
+6       Private   >50K  4963
+7 Self-Employed  <=50K  2311
+8 Self-Employed   >50K  1346
+> # calculate the percentages
+> df <- ddply(df, .(industry), transform, percent = count/sum(count) * 100)
+> # format the labels and calculate their positions
+> df <- ddply(df, .(industry), transform, pos = (cumsum(count) - 0.5 * count))
+> df$label <- paste0(sprintf("%.0f", df$percent), "%")
+> # bar plot of counts by industry with in group proportions 
+> ggplot(df, aes(x = industry, y = count, fill = income)) +
++   geom_bar(stat = "identity") +
++   geom_text(aes(y = pos, label = label), size = 2) + 
++   ggtitle('Income by Industry')
+> # create a dataframe
+> df1 <- data.frame(table(adult$income, adult$educatoin_num))
+> names(df1) <- c('income', 'education_num', 'count')
+> df1
+   income education_num count
+1   <=50K             1    51
+2    >50K             1     0
+3   <=50K             2   162
+4    >50K             2     6
+5   <=50K             3   317
+6    >50K             3    16
+7   <=50K             4   606
+8    >50K             4    40
+9   <=50K             5   487
+10   >50K             5    27
+11  <=50K             6   871
+12   >50K             6    62
+13  <=50K             7  1115
+14   >50K             7    60
+15  <=50K             8   400
+16   >50K             8    33
+17  <=50K             9  8826
+18   >50K             9  1675
+19  <=50K            10  5904
+20   >50K            10  1387
+21  <=50K            11  1021
+22   >50K            11   361
+23  <=50K            12   802
+24   >50K            12   265
+25  <=50K            13  3134
+26   >50K            13  2221
+27  <=50K            14   764
+28   >50K            14   959
+29  <=50K            15   153
+30   >50K            15   423
+31  <=50K            16   107
+32   >50K            16   306
+> # calculate the percentages
+> df1 <- ddply(df1, .(education_num), transform, percent = count/sum(count) * 100)
+> # format the labels and calculate their positions
+> df1 <- ddply(df1, .(education_num), transform, pos = (cumsum(count) - 0.5 * count))
+> df1$label <- paste0(sprintf("%.0f", df1$percent), "%")
+> # remove some in group percentage to avoid overlapped text
+> df1$label[which(df1$percent < 5)] <- NA
+> # bar plot of counts by years of education with in group proportions 
+> ggplot(df1, aes(x = education_num, y = count, fill = income)) +
++   geom_bar(stat = "identity") +
++   geom_text(aes(y = pos, label = label), size = 2) + 
++   ggtitle('Income Level with Years of Education')
+Warning message:
+Removed 3 rows containing missing values (geom_text). 
+> summary(adult$occupation)
+                ?      Adm-clerical      Armed-Forces      Craft-repair   Exec-managerial 
+             1843              3770                 9              4099              4066 
+  Farming-fishing Handlers-cleaners Machine-op-inspct     Other-service   Priv-house-serv 
+              994              1370              2002              3295               149 
+   Prof-specialty   Protective-serv             Sales      Tech-support  Transport-moving 
+             4140               649              3650               928              1597 
+> levels(adult$occupation)[1] <- 'Unknown'
+> adult$occupation <- gsub('Adm-clerical', 'White-Collar', adult$occupation)
+> adult$occupation <- gsub('Craft-repair', 'Blue-Collar', adult$occupation)
+> adult$occupation <- gsub('Exec-managerial', 'White-Collar', adult$occupation)
+> adult$occupation <- gsub('Farming-fishing', 'Blue-Collar', adult$occupation)
+> adult$occupation <- gsub('Handlers-cleaners', 'Blue-Collar', adult$occupation)
+> adult$occupation <- gsub('Machine-op-inspct', 'Blue-Collar', adult$occupation)
+> adult$occupation <- gsub('Other-service', 'Service', adult$occupation)
+> adult$occupation <- gsub('Priv-house-serv', 'Service', adult$occupation)
+> adult$occupation <- gsub('Prof-specialty', 'Professional', adult$occupation)
+> adult$occupation <- gsub('Protective-serv', 'Service', adult$occupation)
+> adult$occupation <- gsub('Tech-support', 'Service', adult$occupation)
+> adult$occupation <- gsub('Transport-moving', 'Blue-Collar', adult$occupation)
+> adult$occupation <- gsub('Unknown', 'Other/Unknown', adult$occupation)
+> adult$occupation <- gsub('Armed-Forces', 'Other/Unknown', adult$occupation)
+> adult$occupation <- as.factor(adult$occupation)
+> summary(adult$occupation)
+  Blue-Collar Other/Unknown  Professional         Sales       Service  White-Collar 
+        10062          1852          4140          3650          5021          7836 
+> # create a dataframe
+> df2 <- data.frame(table(adult$income, adult$occupation))
+> names(df2) <- c('income', 'occupation', 'count')
+> df2
+   income    occupation count
+1   <=50K   Blue-Collar  8362
+2    >50K   Blue-Collar  1700
+3   <=50K Other/Unknown  1660
+4    >50K Other/Unknown   192
+5   <=50K  Professional  2281
+6    >50K  Professional  1859
+7   <=50K         Sales  2667
+8    >50K         Sales   983
+9   <=50K       Service  4389
+10   >50K       Service   632
+11  <=50K  White-Collar  5361
+12   >50K  White-Collar  2475
+> # calculate the percentages
+> df2 <- ddply(df2, .(occupation), transform, percent = count/sum(count) * 100)
+> # format the labels and calculate their positions
+> df2 <- ddply(df2, .(occupation), transform, pos = (cumsum(count) - 0.5 * count))
+> df2$label <- paste0(sprintf("%.0f", df2$percent), "%")
+> # bar plot of counts by occupation with in group proportions 
+> ggplot(df2, aes(x = occupation, y = count, fill = income)) +
++   geom_bar(stat = "identity") +
++   geom_text(aes(y = pos, label = label), size = 2) + 
++   ggtitle('Income Level with Different Occupations')
+> summary(adult$marital_status)
+             Divorced     Married-AF-spouse    Married-civ-spouse Married-spouse-absent 
+                 4443                    23                 14976                   418 
+        Never-married             Separated               Widowed 
+                10683                  1025                   993 
+> adult$marital_status <- gsub('Married-AF-spouse', 'Married', adult$marital_status)
+> adult$marital_status <- gsub('Married-civ-spouse', 'Married', adult$marital_status)
+> adult$marital_status <- gsub('Married-spouse-absent', 'Married', adult$marital_status)
+> adult$marital_status <- gsub('Never-married', 'Single', adult$marital_status)
+> adult$marital_status <- as.factor(adult$marital_status)
+> summary(adult$marital_status)
+ Divorced   Married Separated    Single   Widowed 
+     4443     15417      1025     10683       993 
+> df3 <- data.frame(table(adult$income, adult$marital_status))
+> names(df3) <- c('income', 'marital_status', 'count')
+> df3
+   income marital_status count
+1   <=50K       Divorced  3980
+2    >50K       Divorced   463
+3   <=50K        Married  8681
+4    >50K        Married  6736
+5   <=50K      Separated   959
+6    >50K      Separated    66
+7   <=50K         Single 10192
+8    >50K         Single   491
+9   <=50K        Widowed   908
+10   >50K        Widowed    85
+> # calculate the percentages
+> df3 <- ddply(df3, .(marital_status), transform, percent = count/sum(count) * 100)
+> # format the labels and calculate their positions
+> df3 <- ddply(df3, .(marital_status), transform, pos = (cumsum(count) - 0.5 * count))
+> df3$label <- paste0(sprintf("%.0f", df3$percent), "%")
+> # bar plot of counts by marital status with in group proportions 
+> ggplot(df3, aes(x = marital_status, y = count, fill = income)) +
++   geom_bar(stat = "identity") +
++   geom_text(aes(y = pos, label = label), size = 2) + 
++   ggtitle('Income Level with Marital Status')
+> # histogram of capital_gain
+> ggplot(adult) + aes(x=as.numeric(capital_gain), group=income, fill=income) + 
++   geom_histogram(bins=10, color='black') + ggtitle('Histogram of Capital Gain')
+> # histogram of capital_loss
+> ggplot(adult) + aes(x=as.numeric(capital_loss), group=income, fill=income) + 
++   geom_histogram(bins=10, color='black') + ggtitle('Histogram of Capital Loss')
+> # percentage of observatiosn with no capital gain or loss
+> sum(adult$capital_gain == 0)/length(adult$capital_gain)
+[1] 0.9167102
+> sum(adult$capital_loss == 0)/length(adult$capital_loss)
+[1] 0.9533491
+> adult$capital_gain <- NULL
+> adult$capital_loss <- NULL
+> adult$native_country <- NULL
+> df4 <- data.frame(table(adult$income, adult$race))
+> names(df4) <- c('income', 'race', 'count')
+> df4
+   income               race count
+1   <=50K Amer-Indian-Eskimo   275
+2    >50K Amer-Indian-Eskimo    36
+3   <=50K Asian-Pac-Islander   763
+4    >50K Asian-Pac-Islander   276
+5   <=50K              Black  2737
+6    >50K              Black   387
+7   <=50K              Other   246
+8    >50K              Other    25
+9   <=50K              White 20699
+10   >50K              White  7117
+> # calculate the percentages
+> df4 <- ddply(df4, .(race), transform, percent = count/sum(count) * 100)
+> # format the labels and calculate their positions
+> df4 <- ddply(df4, .(race), transform, pos = (cumsum(count) - 0.5 * count))
+> df4$label <- paste0(sprintf("%.0f", df4$percent), "%")
+> # do not display percentage for low counts categories
+> df4$label[df4$race == 'Other'] <- NA
+> df4$label[df4$race == 'Amer-Indian-Eskimo'] <- NA
+> # bar plot of counts by marital status with in group proportions 
+> ggplot(df4, aes(x = race, y = count, fill = income)) +
++   geom_bar(stat = "identity") +
++   geom_text(aes(y = pos, label = label), size = 2) + 
++   ggtitle('Income Level by Race')
+Warning message:
+Removed 4 rows containing missing values (geom_text). 
+> summary(adult)
+      age                workclass     educatoin_num     marital_status          occupation   
+ Min.   :17.00   Government   : 4351   Min.   : 1.00   Divorced : 4443   Blue-Collar  :10062  
+ 1st Qu.:28.00   Other/Unknown: 1857   1st Qu.: 9.00   Married  :15417   Other/Unknown: 1852  
+ Median :37.00   Private      :22696   Median :10.00   Separated: 1025   Professional : 4140  
+ Mean   :38.58   Self-Employed: 3657   Mean   :10.08   Single   :10683   Sales        : 3650  
+ 3rd Qu.:48.00                         3rd Qu.:12.00   Widowed  :  993   Service      : 5021  
+ Max.   :90.00                         Max.   :16.00                     White-Collar : 7836  
+                 race           sex        hours_per_week    income     
+ Amer-Indian-Eskimo:  311   Female:10771   Min.   : 1.00   <=50K:24720  
+ Asian-Pac-Islander: 1039   Male  :21790   1st Qu.:40.00   >50K : 7841  
+ Black             : 3124                  Median :40.00                
+ Other             :  271                  Mean   :40.44                
+ White             :27816                  3rd Qu.:45.00                
+                                           Max.   :99.00                
+> # training set size
+> sz <- round(.8 * dim(adult)[1])  
+> training_set <- adult[1:sz,]
+> testing_set <- adult[-(1:sz),]
+> m1 <- glm(income ~ ., data = training_set, family = binomial('logit'))
+> summary(m1)
+
+Call:
+glm(formula = income ~ ., family = binomial("logit"), data = training_set)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.6900  -0.5892  -0.2606  -0.0752   3.2844  
+
+Coefficients:
+                         Estimate Std. Error z value Pr(>|z|)    
+(Intercept)             -9.304867   0.278827 -33.371  < 2e-16 ***
+age                      0.028424   0.001632  17.413  < 2e-16 ***
+workclassOther/Unknown  -1.226062   0.812990  -1.508   0.1315    
+workclassPrivate         0.065641   0.053401   1.229   0.2190    
+workclassSelf-Employed  -0.143134   0.068836  -2.079   0.0376 *  
+educatoin_num            0.316604   0.009367  33.799  < 2e-16 ***
+marital_statusMarried    2.009367   0.067075  29.957  < 2e-16 ***
+marital_statusSeparated -0.118183   0.162774  -0.726   0.4678    
+marital_statusSingle    -0.456110   0.082510  -5.528 3.24e-08 ***
+marital_statusWidowed   -0.049819   0.153751  -0.324   0.7459    
+occupationOther/Unknown  0.890005   0.811907   1.096   0.2730    
+occupationProfessional   0.758835   0.067266  11.281  < 2e-16 ***
+occupationSales          0.493151   0.063295   7.791 6.63e-15 ***
+occupationService        0.156311   0.066728   2.343   0.0192 *  
+occupationWhite-Collar   0.775103   0.052391  14.795  < 2e-16 ***
+raceAsian-Pac-Islander   0.127056   0.248409   0.511   0.6090    
+raceBlack                0.307972   0.237403   1.297   0.1945    
+raceOther               -0.466651   0.370702  -1.259   0.2081    
+raceWhite                0.489306   0.227223   2.153   0.0313 *  
+sexMale                  0.387568   0.051550   7.518 5.55e-14 ***
+hours_per_week           0.030626   0.001629  18.802  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 28685  on 26048  degrees of freedom
+Residual deviance: 19163  on 26028  degrees of freedom
+AIC: 19205
+
+Number of Fisher Scoring iterations: 6
+
+> confint(m1)
+Waiting for profiling to be done...
+                              2.5 %       97.5 %
+(Intercept)             -9.86450760 -8.769848897
+age                      0.02522800  0.031627206
+workclassOther/Unknown  -2.81095155  0.353340625
+workclassPrivate        -0.03879528  0.170549950
+workclassSelf-Employed  -0.27807457 -0.008224174
+educatoin_num            0.29832991  0.335050878
+marital_statusMarried    1.87910604  2.142085777
+marital_statusSeparated -0.44670006  0.192468641
+marital_statusSingle    -0.61768425 -0.294168625
+marital_statusWidowed   -0.35840810  0.245101683
+occupationOther/Unknown -0.69042951  2.469666670
+occupationProfessional   0.62703557  0.890730836
+occupationSales          0.36894319  0.617075711
+occupationService        0.02504151  0.286644006
+occupationWhite-Collar   0.67249541  0.877875622
+raceAsian-Pac-Islander  -0.34768819  0.628341149
+raceBlack               -0.14373152  0.789261324
+raceOther               -1.20916579  0.249803089
+raceWhite                0.05890259  0.952096611
+sexMale                  0.28666433  0.488756993
+hours_per_week           0.02744120  0.033826994
+> m_full <- m1  # full model is the model just fitted
+> m_null <- glm(income ~ 1, data = training_set, family = binomial('logit'))
+> # backward selection
+> step(m_full, trace = F, scope = list(lower=formula(m_null), upper=formula(m_full)),
++      direction = 'backward')
+
+Call:  glm(formula = income ~ age + workclass + educatoin_num + marital_status + 
+    occupation + race + sex + hours_per_week, family = binomial("logit"), 
+    data = training_set)
+
+Coefficients:
+            (Intercept)                      age   workclassOther/Unknown  
+               -9.30487                  0.02842                 -1.22606  
+       workclassPrivate   workclassSelf-Employed            educatoin_num  
+                0.06564                 -0.14313                  0.31660  
+  marital_statusMarried  marital_statusSeparated     marital_statusSingle  
+                2.00937                 -0.11818                 -0.45611  
+  marital_statusWidowed  occupationOther/Unknown   occupationProfessional  
+               -0.04982                  0.89000                  0.75883  
+        occupationSales        occupationService   occupationWhite-Collar  
+                0.49315                  0.15631                  0.77510  
+ raceAsian-Pac-Islander                raceBlack                raceOther  
+                0.12706                  0.30797                 -0.46665  
+              raceWhite                  sexMale           hours_per_week  
+                0.48931                  0.38757                  0.03063  
+
+Degrees of Freedom: 26048 Total (i.e. Null);  26028 Residual
+Null Deviance:	    28690 
+Residual Deviance: 19160 	AIC: 19210
+> # forward selection
+> step(m_null, trace = F, scope = list(lower=formula(m_null), upper=formula(m_full)),
++      direction = 'forward')
+
+Call:  glm(formula = income ~ marital_status + educatoin_num + hours_per_week + 
+    age + occupation + sex + race + workclass, family = binomial("logit"), 
+    data = training_set)
+
+Coefficients:
+            (Intercept)    marital_statusMarried  marital_statusSeparated  
+               -9.30487                  2.00937                 -0.11818  
+   marital_statusSingle    marital_statusWidowed            educatoin_num  
+               -0.45611                 -0.04982                  0.31660  
+         hours_per_week                      age  occupationOther/Unknown  
+                0.03063                  0.02842                  0.89000  
+ occupationProfessional          occupationSales        occupationService  
+                0.75883                  0.49315                  0.15631  
+ occupationWhite-Collar                  sexMale   raceAsian-Pac-Islander  
+                0.77510                  0.38757                  0.12706  
+              raceBlack                raceOther                raceWhite  
+                0.30797                 -0.46665                  0.48931  
+ workclassOther/Unknown         workclassPrivate   workclassSelf-Employed  
+               -1.22606                  0.06564                 -0.14313  
+
+Degrees of Freedom: 26048 Total (i.e. Null);  26028 Residual
+Null Deviance:	    28690 
+Residual Deviance: 19160 	AIC: 19210
+> # create a data frame to store information regarding deviance residuals
+> index <- 1:dim(training_set)[1]
+> dev_resid <- residuals(m1)
+> income <- training_set$income
+> dff <- data.frame(index, dev_resid, income)
+> ggplot(dff, aes(x = index, y = dev_resid, color = income)) +
++   geom_point() + 
++   geom_hline(yintercept = 3, linetype = 'dashed', color = 'blue') +
++   geom_hline(yintercept = -3, linetype = 'dashed', color = 'blue')
+> ggtitle('Plot of Deviance Residuals')
+$title
+[1] "Plot of Deviance Residuals"
+
+attr(,"class")
+[1] "labels"
+> prob <- predict(m1, testing_set, type = 'response')
+> pred <- rep('<=50K', length(prob))
+> pred[prob>=.5] <- '>50K'
+> # confusion matrix 
+> tb <- table(pred, testing_set$income)
+> tb
+       
+pred    <=50K >50K
+  <=50K  4533  745
+  >50K    379  855
+> library(nnet)
+> nn1 <- nnet(income ~ ., data = training_set, size = 40, maxit = 500)
+# weights:  881
+initial  value 34207.387056 
+iter  10 value 15236.815436
+iter  20 value 13465.472893
+iter  30 value 11405.206889
+iter  40 value 11015.822146
+iter  50 value 10238.448514
+iter  60 value 9783.349966
+iter  70 value 9639.551473
+iter  80 value 9530.799829
+iter  90 value 9478.490652
+iter 100 value 9429.611303
+iter 110 value 9407.421691
+iter 120 value 9400.454665
+iter 130 value 9391.924976
+iter 140 value 9382.379899
+iter 150 value 9367.753047
+iter 160 value 9331.392640
+iter 170 value 9291.626285
+iter 180 value 9268.980654
+iter 190 value 9254.702459
+iter 200 value 9237.977399
+iter 210 value 9225.453605
+iter 220 value 9189.678596
+iter 230 value 9176.557049
+iter 240 value 9154.415656
+iter 250 value 9134.529329
+iter 260 value 9128.412083
+iter 270 value 9125.421284
+iter 280 value 9120.965726
+iter 290 value 9117.510833
+iter 300 value 9113.240077
+iter 310 value 9107.283764
+iter 320 value 9102.963559
+iter 330 value 9099.355741
+iter 340 value 9097.936610
+iter 350 value 9096.321207
+iter 360 value 9093.656139
+iter 370 value 9092.011464
+iter 380 value 9091.879607
+iter 390 value 9091.790030
+iter 400 value 9091.613222
+iter 410 value 9091.079146
+iter 420 value 9090.173108
+iter 430 value 9088.963306
+iter 440 value 9086.767025
+iter 450 value 9085.581636
+iter 460 value 9085.351062
+iter 470 value 9084.972291
+iter 480 value 9084.568943
+iter 490 value 9084.117508
+iter 500 value 9083.888571
+final  value 9083.888571 
+stopped after 500 iterations
+> nn1.pred <- predict(nn1, newdata = testing_set, type = 'raw')
+> pred1 <- rep('<=50K', length(nn1.pred))
+> pred1[nn1.pred>=.5] <- '>50K'
+> # confusion matrix 
+> tb1 <- table(pred1, testing_set$income)
+> tb1
+       
+pred1   <=50K >50K
+  <=50K  4519  721
+  >50K    393  879
+> library(rpart)
+> tree2 <- rpart(income ~ ., data = training_set, method = 'class', cp = 1e-3)
+> tree2.pred.prob <- predict(tree2, newdata = testing_set, type = 'prob')
+> tree2.pred <- predict(tree2, newdata = testing_set, type = 'class')
+> # confusion matrix 
+> tb2 <- table(tree2.pred, testing_set$income)
+> tb2
+          
+tree2.pred <=50K >50K
+     <=50K  4533  732
+     >50K    379  868
+> library(randomForest)
+randomForest 4.6-14
+Type rfNews() to see new features/changes/bug fixes.
+
+Attaching package: ‘randomForest’
+
+The following object is masked from ‘package:ggplot2’:
+
+    margin
+
+Warning message:
+package ‘randomForest’ was built under R version 3.6.2 
+> rf3 <- randomForest(income ~ ., data = training_set, ntree = 1000)
+> rf3.pred.prob <- predict(rf3, newdata = testing_set, type = 'prob')
+> rf3.pred <- predict(rf3, newdata = testing_set, type = 'class')
+> # confusion matrix 
+> tb3 <- table(rf3.pred, testing_set$income)
+> tb3
+        
+rf3.pred <=50K >50K
+   <=50K  4559  711
+   >50K    353  889
+> library(kernlab)
+
+Attaching package: ‘kernlab’
+
+The following object is masked from ‘package:ggplot2’:
+
+    alpha
+
+> svm4 <- ksvm(income ~ ., data = training_set)
+> svm4.pred.prob <- predict(svm4, newdata = testing_set, type = 'decision')
+> svm4.pred <- predict(svm4, newdata = testing_set, type = 'response')
+> # confusion matrix 
+> tb4 <- table(svm4.pred, testing_set$income)
+> tb4
+         
+svm4.pred <=50K >50K
+    <=50K  4582  773
+    >50K    330  827
+> # create a prediction object
+> pr <- prediction(prob, testing_set$income)
+> prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+> # create a data frame for TP and FP rates
+> dd <- data.frame(FP = prf@x.values[[1]], TP = prf@y.values[[1]])
+> # NN
+> pr1 <- prediction(nn1.pred, testing_set$income)
+> prf1 <- performance(pr1, measure = "tpr", x.measure = "fpr")
+> dd1 <- data.frame(FP = prf1@x.values[[1]], TP = prf1@y.values[[1]])
+> # CART
+> pr2 <- prediction(tree2.pred.prob[,2], testing_set$income)
+> prf2 <- performance(pr2, measure = "tpr", x.measure = "fpr")
+> dd2 <- data.frame(FP = prf2@x.values[[1]], TP = prf2@y.values[[1]])
+> # RF
+> pr3 <- prediction(rf3.pred.prob[,2], testing_set$income)
+> prf3 <- performance(pr3, measure = "tpr", x.measure = "fpr")
+> dd3 <- data.frame(FP = prf3@x.values[[1]], TP = prf3@y.values[[1]])
+> # SVM
+> pr4 <- prediction(svm4.pred.prob, testing_set$income)
+> prf4 <- performance(pr4, measure = "tpr", x.measure = "fpr")
+> dd4 <- data.frame(FP = prf4@x.values[[1]], TP = prf4@y.values[[1]])
+> # plot ROC curve for logistic regression
+> g <- ggplot() + 
++   geom_line(data = dd, aes(x = FP, y = TP, color = 'Logistic Regression')) + 
++   geom_line(data = dd1, aes(x = FP, y = TP, color = 'Neural Networks')) + 
++   geom_line(data = dd2, aes(x = FP, y = TP, color = 'CART')) + 
++   geom_line(data = dd3, aes(x = FP, y = TP, color = 'Random Forest')) +
++   geom_line(data = dd4, aes(x = FP, y = TP, color = 'Support Vector Machine')) +
++   geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1)) +
++   ggtitle('ROC Curve') + 
++   labs(x = 'False Positive Rate', y = 'True Positive Rate') 
+> g +  scale_colour_manual(name = 'Classifier', values = c('Logistic Regression'='#E69F00', 
++                                                          'Neural Networks'='#56B4E9', 'CART'='#009E73', 
++                                                          'Random Forest'='#D55E00', 'Support Vector Machine'='#0072B2'))
+> # AUC
+> auc <- rbind(performance(pr, measure = 'auc')@y.values[[1]],
++              performance(pr1, measure = 'auc')@y.values[[1]],
++              performance(pr2, measure = 'auc')@y.values[[1]],
++              performance(pr3, measure = 'auc')@y.values[[1]],
++              performance(pr4, measure = 'auc')@y.values[[1]])
+> rownames(auc) <- (c('Logistic Regression', 'Neural Networks', 'CART',
++                     'Random Forest', 'Support Vector Machine'))
+> colnames(auc) <- 'Area Under ROC Curve'
+> round(auc, 4)
+                       Area Under ROC Curve
+Logistic Regression                  0.8825
+Neural Networks                      0.8853
+CART                                 0.8501
+Random Forest                        0.8725
+Support Vector Machine               0.8608
